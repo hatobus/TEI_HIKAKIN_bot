@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/hatobus/tei_hikakin/twitter"
 	"github.com/hatobus/tei_hikakin/util"
 	"github.com/hatobus/tei_hikakin/youtube"
 )
@@ -61,4 +62,10 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
+
+	err = twitter.PostPicture()
+	if err != nil {
+		log.Println(err)
+	}
+
 }

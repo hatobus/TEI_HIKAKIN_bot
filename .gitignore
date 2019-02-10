@@ -16,3 +16,4 @@
 # My env file
 .env
 *.jpg
+*.png
