@@ -16,4 +16,9 @@ func main() {
 	} else {
 		log.Println(videoID)
 	}
+
+	err = youtube.GetThumbnail(videoID)
+	if err != nil {
+		log.Println(err)
+	}
 }
