@@ -12,7 +12,7 @@ import (
 func PostPicture() error {
 	anaconda.SetConsumerKey(os.Getenv("TWAPIKEY"))
 	anaconda.SetConsumerSecret(os.Getenv("TWAPIKEYSECRET"))
-	api := anaconda.NewTwitterApi(os.Getenv("TWAPIKEY"), os.Getenv("TWAPIKEYSECRET"))
+	api := anaconda.NewTwitterApi(os.Getenv("TWACCESSTOKEN"), os.Getenv("TWACCESSTOKENSECRET"))
 
 	exe, _ := os.Getwd()
 
