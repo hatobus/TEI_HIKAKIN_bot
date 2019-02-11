@@ -1,7 +1,9 @@
 package youtube
 
 import (
+	"io"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/hatobus/Teikyo/callapi"
@@ -23,6 +25,22 @@ func GenTeikyo() error {
 	landmark, err := callapi.DetectFace(f)
 	if err != nil {
 		return err
+	}
+
+	if len(landmark) == 0 {
+		f.Seek(0, 0)
+		outfile, err := os.Create(path.Join(exe, "picture", "output", "output0.png"))
+		if err != nil {
+			return err
+		}
+		defer outfile.Close()
+
+		_, err = io.Copy(outfile, f)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	mul := false
