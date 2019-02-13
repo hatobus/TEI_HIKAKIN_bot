@@ -2,6 +2,7 @@ package twitter
 
 import (
 	"encoding/base64"
+	_ "image/png"
 	"net/url"
 	"os"
 	"path"
