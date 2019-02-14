@@ -13,7 +13,7 @@ import (
 	"github.com/hatobus/tei_hikakin/models"
 )
 
-func GetLatestMovieID() (string, error) {
+func GetLatestMovieID(channelID string) (string, error) {
 	URL := "https://www.googleapis.com/youtube/v3/search"
 	YOUTUBEKEY := os.Getenv("YOUTUBEKEY")
 
@@ -24,7 +24,7 @@ func GetLatestMovieID() (string, error) {
 
 	query := url.Values{
 		"part":      {"id"},
-		"channelId": {os.Getenv("HIKAKIN_CHANNELID")},
+		"channelId": {channelID},
 		"order":     {"date"},
 		"key":       {YOUTUBEKEY},
 	}
