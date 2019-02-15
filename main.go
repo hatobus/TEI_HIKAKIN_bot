@@ -17,9 +17,10 @@ func main() {
 
 	isNew := false
 	var channel, videoID string
+	var err error
 
 	for _, elem := range channelelem {
-		videoID, err := youtube.GetLatestMovieID(os.Getenv("HIKAKIN" + elem))
+		videoID, err = youtube.GetLatestMovieID(os.Getenv("HIKAKIN" + elem))
 		if err != nil {
 			log.Println(err)
 		} else {
