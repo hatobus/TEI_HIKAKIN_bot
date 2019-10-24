@@ -92,3 +92,37 @@ func GetThumbnail(videoID string) error {
 	return nil
 
 }
+
+func CFGetThumbnail(videoID string) error {
+	URL := "https://img.youtube.com/vi/"
+	exe, _ := os.Getenv("ENTRY_POINT")
+	savedir := filepath.Join(exe, "picture", "thumbnail", "thumbnail.jpg")
+
+	u, err := url.Parse(URL)
+	if err != nil {
+		return nil
+	}
+
+	u.Path = path.Join(u.Path, videoID, "maxresdefault.jpg")
+
+	res, err := http.Get(u.String())
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+
+	file, err := os.Create(savedir)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, res.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
