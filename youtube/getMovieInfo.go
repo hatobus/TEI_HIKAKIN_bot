@@ -95,7 +95,7 @@ func GetThumbnail(videoID string) error {
 
 func CFGetThumbnail(videoID string) error {
 	URL := "https://img.youtube.com/vi/"
-	exe, _ := os.Getenv("ENTRY_POINT")
+	exe := os.Getenv("ENTRY_POINT")
 	savedir := filepath.Join(exe, "picture", "thumbnail", "thumbnail.jpg")
 
 	u, err := url.Parse(URL)
