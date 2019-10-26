@@ -12,7 +12,7 @@ import (
 
 func GenTeikyo() error {
 
-	exe, _ := os.Getwd()
+	exe := os.Getenv("ENTRY_POINT")
 	picdir := filepath.Join(exe, "picture", "thumbnail", "thumbnail.jpg")
 
 	f, err := os.Open(picdir)

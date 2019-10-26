@@ -1,85 +1,58 @@
-package main
+package p
 
 import (
-	"bufio"
+	"encoding/xml"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
+	model "github.com/hatobus/tei_hikakin/models"
 	"github.com/hatobus/tei_hikakin/twitter"
-	"github.com/hatobus/tei_hikakin/util"
 	"github.com/hatobus/tei_hikakin/youtube"
 )
 
-func main() {
-	util.Loadenv()
-
-	channelelem := []string{"", "_TV", "_GAMES", "_BLOG"}
-
-	isNew := false
-	var channel, videoID string
-	var err error
-
-	for _, elem := range channelelem {
-		videoID, err = youtube.GetLatestMovieID(os.Getenv("HIKAKIN" + elem))
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Println(videoID)
-		}
-
-		// Checking videoID for new videos.
-		f, err := os.Open("./HIKAKIN" + elem + ".txt")
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		scanner := bufio.NewScanner(f)
-
-		var prevID string
-		for scanner.Scan() {
-			prevID = scanner.Text()
-			log.Println(prevID)
-		}
-
-		if prevID != videoID {
-			isNew = true
-			channel = elem
-			f.Close()
-			break
-		}
-
-		f.Close()
+func GenerateTeikyoEye(w http.ResponseWriter, r *http.Request) {
+	if challenge := r.URL.Query().Get("hub.challenge"); challenge != "" {
+		log.Println(challenge)
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, challenge)
+		return
 	}
 
-	if !isNew {
-		log.Println("Already got thumbnail")
-		// Golang's "os.Exist" can't execute defer method.
-		os.Exit(0)
-	}
+	sub := &model.Subsc{}
 
-	f, err := os.Create("./HIKAKIN" + channel + ".txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer f.Close()
-
-	if _, err = f.WriteString(videoID); err != nil {
-		log.Fatalln(err)
-	}
-
-	err = youtube.GetThumbnail(videoID)
-	if err != nil {
+	if err := xml.NewDecoder(r.Body).Decode(sub); err != nil {
 		log.Println(err)
+		fmt.Fprint(w, "")
+		return
 	}
+
+	if sub.Entry.Title == "" || sub.Entry.VideoId == "" {
+		log.Println("title or video id is null")
+		return
+	} else if sub.Entry.VideoId == os.Getenv("LATEST_VIDEO_ID") {
+		log.Println("already generated")
+		return
+	}
+
+	err := youtube.CFGetThumbnail(sub.Entry.VideoId)
+	if err != nil {
+		log.Println("youtube getthumbnail error : %v", err)
+		return
+	}
+
+	log.Printf("Video Title : %s, Video ID : %s", sub.Entry.Title, sub.Entry.VideoId)
 
 	err = youtube.GenTeikyo()
 	if err != nil {
-		log.Println(err)
+		log.Println("youtube genteikyo error : %v", err)
+		return
 	}
 
 	err = twitter.PostPicture()
 	if err != nil {
-		log.Println(err)
+		log.Println("twitter PostPicture error : %v", err)
+		return
 	}
-
 }
